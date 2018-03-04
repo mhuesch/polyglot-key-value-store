@@ -16,5 +16,6 @@ executable kvstore
   build-depends:       base >=4.9 && <4.10
                      , acid-state
                      , containers
+                     , haskeline
                      , mtl
   default-language:    Haskell2010
