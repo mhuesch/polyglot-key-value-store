@@ -60,6 +60,12 @@ kvSet (KVStore hdl dictR) key val = do
   hFlush hdl
 
 
+kvAllKeys :: KVStore -> IO [Key]
+kvAllKeys (KVStore _ dictR) = do
+  dict <- readIORef dictR
+  return (M.keys dict)
+
+
 kvGet :: KVStore -> Key -> IO (Maybe Val)
 kvGet (KVStore hdl dictR) key = do
   dict <- readIORef dictR
