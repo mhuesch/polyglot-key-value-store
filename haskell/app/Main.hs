@@ -1,27 +1,34 @@
 module Main where
 
 
+import           Control.Monad
 import           Control.Monad.IO.Class
+import           Data.List
 import           System.Console.Haskeline
 import           System.Environment
 import           System.IO
 
+import           CmdLine
 import           Data.KVStore
 
 
 main :: IO ()
 main = do
-  args <- getArgs
-  let mbFP = case args of
-               [fp] -> Just fp
-               _    -> Nothing
-  kvs <- openKVStore mbFP
-  printWelcome
-  runInputT defaultSettings (loop kvs)
+  (posArgs, opts) <- getOptions
+  kvs <- openKVStore (optDBFP opts)
+  when (optInteractive opts) $
+    printWelcome
+  runInputT mySettings (runRepl (optInteractive opts) kvs)
+
+
+runRepl :: Bool -> KVStore -> InputT IO ()
+runRepl isInteractive kvs = loop
   where
-    loop :: KVStore -> InputT IO ()
-    loop kvs = do
-      minput <- getInputLine "> "
+    prompt = if isInteractive
+                then "> "
+                else ""
+    loop = do
+      minput <- getInputLine prompt
       case minput of
         Nothing -> return ()
         Just "quit" -> return ()
@@ -44,7 +51,7 @@ main = do
 
             _ -> outputStrLn "unrecognized command. type `help` for help."
 
-          loop kvs
+          loop
 
 
 outprint :: Show a => a -> InputT IO ()
@@ -62,11 +69,23 @@ printHelp :: IO ()
 printHelp = do
   putStrLn "available commands:"
   mapM_ putStrLn availableCommands
-    where
-      availableCommands = [ "set <key> value>"
-                          , "get <key>"
-                          , "delete <key>"
-                          , "all-keys"
-                          , "help"
-                          , "quit"
-                          ]
+
+availableCommands :: [String]
+availableCommands = [ "set <key> value>"
+                    , "get <key>"
+                    , "delete <key>"
+                    , "all-keys"
+                    , "help"
+                    , "quit"
+                    ]
+
+wordList = map (head . words) availableCommands
+
+searchFunc :: String -> [Completion]
+searchFunc str = map simpleCompletion $ filter (str `isPrefixOf`) wordList
+
+mySettings :: Settings IO
+mySettings = Settings { historyFile = Nothing
+                      , complete = completeWord Nothing " \t" $ return . searchFunc
+                      , autoAddHistory = True
+                      }

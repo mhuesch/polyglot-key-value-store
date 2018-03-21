@@ -10,6 +10,7 @@ import           Data.Int
 import           Data.Map (Map)
 import qualified Data.Map as M
 import           System.Directory
+import           System.Exit
 import           System.IO
 
 
@@ -87,7 +88,10 @@ openKVStore Nothing = do
   return (KVStore hdl dict)
 --
 openKVStore (Just fp) = do
-  hdl <- openFile fp ReadWriteMode
+  exists <- doesFileExist fp
+  hdl <- if exists
+            then openFile fp ReadWriteMode
+            else hPutStrLn stderr "db file doesn't exist" >> exitFailure
   dict <- newIORef =<< extractDict hdl
   return (KVStore hdl dict)
 

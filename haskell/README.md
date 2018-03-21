@@ -3,6 +3,12 @@
 - install [stack](https://docs.haskellstack.org/en/stable/README/)
 - to build: `stack build`
 
+## example run
+
+see `test_run.txt`. kvstore can handle stdin input, like so: `cat test_run.txt | stack exec -- kvstore`
+
+once a database has been created, it can be reused like so:  `cat test_run.txt | stack exec -- kvstore -d $DB_PATH`
+
 ## design
 
 based on [Basho's BitCask](http://basho.com/wp-content/uploads/2015/05/bitcask-intro.pdf). the file contains a sequence of records of the form
