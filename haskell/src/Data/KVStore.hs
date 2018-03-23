@@ -80,12 +80,12 @@ kvGet (KVStore hdl dictR) key = do
 kvDir :: FilePath
 kvDir = "kv.db"
 
-openKVStore :: Maybe FilePath -> IO KVStore
+openKVStore :: Maybe FilePath -> IO (KVStore, FilePath)
 openKVStore Nothing = do
   createDirectoryIfMissing True kvDir
   (fp,hdl) <- openTempFile kvDir "db"
   dict <- newIORef M.empty
-  return (KVStore hdl dict)
+  return (KVStore hdl dict, fp)
 --
 openKVStore (Just fp) = do
   exists <- doesFileExist fp
@@ -93,7 +93,7 @@ openKVStore (Just fp) = do
             then openFile fp ReadWriteMode
             else hPutStrLn stderr "db file doesn't exist" >> exitFailure
   dict <- newIORef =<< extractDict hdl
-  return (KVStore hdl dict)
+  return (KVStore hdl dict, fp)
 
 closeKVStore :: KVStore -> IO ()
 closeKVStore (KVStore hdl _) = do

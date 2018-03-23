@@ -5,9 +5,9 @@
 
 ## example run
 
-see `test_run.txt`. kvstore can handle stdin input, like so: `cat test_run.txt | stack exec -- kvstore`
+see `test_run.txt`. kvstore can handle stdin input, like so: `cat test_run.txt | stack exec -- kvstore -p`
 
-once a database has been created, it can be reused like so:  `cat test_run.txt | stack exec -- kvstore -d $DB_PATH`
+once a database has been created, it can be reused like so:  `cat test_run.txt | stack exec -- kvstore -p -d $DB_PATH`
 
 ## design
 

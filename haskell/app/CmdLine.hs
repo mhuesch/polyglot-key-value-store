@@ -24,7 +24,7 @@ data Options = Options
   , optDBFP :: Maybe FilePath }
 
 defaultOptions = Options
-  { optInteractive = False
+  { optInteractive = True
   , optDBFP = Nothing }
 
 --------------------------------------------------------------------------------
@@ -64,14 +64,21 @@ showUsage = do
 --------------------------------------------------------------------------------
 options :: [ OptDescr (Options -> IO Options) ]
 options =
-  [ Option "i" ["interactive"]
+  [ Option "p" ["pipe"]
         (NoArg
-            (\opt -> return opt { optInteractive = True }))
-        "interactive REPL mode"
+            (\opt -> return opt { optInteractive = False }))
+        "non-interactive / pipe mode"
 
   , Option "d" ["db-path"]
         (ReqArg
             (\arg opt -> return opt { optDBFP = Just arg })
             "FILEPATH")
         "path to existing database file"
+
+  , Option "h" ["help"]
+        (NoArg
+            (\_ -> do
+              showUsage
+              exitSuccess))
+        "Show help"
   ]

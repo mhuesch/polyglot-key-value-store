@@ -15,7 +15,8 @@ import           Data.KVStore
 main :: IO ()
 main = do
   (posArgs, opts) <- getOptions
-  kvs <- openKVStore (optDBFP opts)
+  (kvs,fp) <- openKVStore (optDBFP opts)
+  putStrLn $ "using database file at `" ++ fp ++ "`"
   when (optInteractive opts) $
     printWelcome
   runInputT mySettings (runRepl (optInteractive opts) kvs)
