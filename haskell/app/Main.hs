@@ -41,12 +41,16 @@ runRepl isInteractive kvs = loop
             ["get", key] -> outprint =<< liftIO (kvGet kvs key)
             ("get":_) -> outputStrLn "get requires one argument"
             --
-            ["delete", key] -> outputStrLn "delete is not currently supported"
+            ["delete", key] -> outprint =<< liftIO (kvDel kvs key)
               -- liftIO (update state (DeleteKey key))
             ("delete":_) -> outputStrLn "delete requires one argument"
             --
             ["all-keys"] -> mapM_ outprint =<< liftIO (kvAllKeys kvs)
             ("all-keys":_) -> outputStrLn "all-keys has no arguments"
+            --
+            ["compact"] -> do newFP <- liftIO (kvCompact kvs)
+                              outputStrLn $ "success. new filepath: `" ++ newFP ++ "`"
+            ("compact":_) -> outputStrLn "compact has no arguments"
             --
             ["help"] -> liftIO printHelp
 
@@ -76,6 +80,7 @@ availableCommands = [ "set <key> value>"
                     , "get <key>"
                     , "delete <key>"
                     , "all-keys"
+                    , "compact"
                     , "help"
                     , "quit"
                     ]
