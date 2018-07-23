@@ -27,6 +27,4 @@ currently we expose a library. it would be simple to create a command line or HT
 
 other TODOs:
 - support datatypes other than strings
-- support deletion of keys (using tombstones)
-- support compaction of the db file
 - support multiple files
